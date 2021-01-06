@@ -1,0 +1,22 @@
+{
+  "data_source": {
+    "name": "binance",
+    "interval": 2000000000,
+    "api_setting": {
+      "base": "https://api3.binance.com",
+      "kline_uri": "/api/v3/klines"
+    },
+    "watch_list": [
+      {
+        "symbol": "ETHUSDT",
+        "interval": "5m",
+        "limit": 12
+      },
+      {
+        "symbol": "BTCUSDT",
+        "interval": "5m",
+        "limit": 12
+      }
+    ]
+  }
+}
