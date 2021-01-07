@@ -10,7 +10,7 @@ import (
 type SmaCross struct {
 }
 
-func (s SmaCross) Calculate(data []lib.KlineData) (attempt lib.DirectionPrediction, err error) {
+func (s SmaCross) Calculate(data []lib.KlineData) (prediction lib.DirectionPrediction, err error) {
 	n1 := config.Get().DataSource.Strategy.SmaCross.N1K
 	n2 := config.Get().DataSource.Strategy.SmaCross.N2K
 	n1Ma, err := s.NkMa(n1, data)
@@ -35,15 +35,15 @@ func (s SmaCross) Calculate(data []lib.KlineData) (attempt lib.DirectionPredicti
 	}
 
 	if n1Ma.GreaterThan(n2Ma) && n1Pma.LessThan(n2Pma) {
-		attempt.PlaceOrderDirection = lib.InLong
-		attempt.HoldDirection = lib.UnknownHold
+		prediction.PlaceOrderDirection = lib.InLong
+		prediction.HoldDirection = lib.UnknownHold
 
 	} else if n1Ma.LessThan(n2Ma) && n1Pma.GreaterThan(n2Pma) {
-		attempt.PlaceOrderDirection = lib.InShort
-		attempt.HoldDirection = lib.UnknownHold
+		prediction.PlaceOrderDirection = lib.InShort
+		prediction.HoldDirection = lib.UnknownHold
 	} else {
-		attempt.PlaceOrderDirection = lib.InUnknown
-		attempt.HoldDirection = lib.UnknownHold
+		prediction.PlaceOrderDirection = lib.InUnknown
+		prediction.HoldDirection = lib.UnknownHold
 	}
 
 	return
