@@ -23,6 +23,6 @@ func Init() (err error) {
 	return
 }
 
-func GetConfig() *Config {
+func Get() *Config {
 	return _config
 }

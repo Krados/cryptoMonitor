@@ -2,7 +2,7 @@ package api
 
 import (
 	"cryptoMonitor/cache"
-	"cryptoMonitor/monitor/binance"
+	"cryptoMonitor/lib"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -11,7 +11,7 @@ import (
 func Start() {
 	r := gin.Default()
 	r.GET("/status/:symbol", func(c *gin.Context) {
-		var resp binance.ShouldAttempt
+		var resp lib.DirectionPrediction
 		valByte, err := cache.Get().Get([]byte(c.Param("symbol")))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, nil)

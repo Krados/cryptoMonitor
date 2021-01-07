@@ -1,6 +1,9 @@
 package config
 
-import "time"
+import (
+	"github.com/shopspring/decimal"
+	"time"
+)
 
 type Config struct {
 	DataSource DataSource `json:"data_source"`
@@ -13,9 +16,10 @@ type APISetting struct {
 }
 
 type WatchList struct {
-	Symbol   string `json:"symbol"`
-	Interval string `json:"interval"`
-	Limit    int    `json:"limit"`
+	Symbol     string   `json:"symbol"`
+	Interval   string   `json:"interval"`
+	Limit      int      `json:"limit"`
+	Strategies []string `json:"strategies"`
 }
 
 type DataSource struct {
@@ -26,7 +30,12 @@ type DataSource struct {
 	Strategy   Strategy      `json:"strategy"`
 }
 
-type Strategy struct {
+type SmaCross struct {
 	N1K int `json:"n_1_k"`
 	N2K int `json:"n_2_k"`
+}
+
+type Strategy struct {
+	Weight   decimal.Decimal `json:"weight"`
+	SmaCross SmaCross        `json:"sma_cross"`
 }
