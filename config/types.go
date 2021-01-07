@@ -7,8 +7,9 @@ type Config struct {
 }
 
 type APISetting struct {
-	Base     string `json:"base"`
-	KlineURI string `json:"kline_uri"`
+	Base           string `json:"base"`
+	KlineURI       string `json:"kline_uri"`
+	LatestPriceURI string `json:"latest_price_uri"`
 }
 
 type WatchList struct {
@@ -22,4 +23,10 @@ type DataSource struct {
 	Interval   time.Duration `json:"interval"`
 	APISetting APISetting    `json:"api_setting"`
 	WatchList  []WatchList   `json:"watch_list"`
+	Strategy   Strategy      `json:"strategy"`
+}
+
+type Strategy struct {
+	N1K int `json:"n_1_k"`
+	N2K int `json:"n_2_k"`
 }

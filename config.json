@@ -1,22 +1,37 @@
 {
   "data_source": {
     "name": "binance",
-    "interval": 2000000000,
+    "interval": 1000000000,
     "api_setting": {
       "base": "https://api3.binance.com",
-      "kline_uri": "/api/v3/klines"
+      "kline_uri": "/api/v3/klines",
+      "latest_price_uri": "/api/v3/ticker/price"
     },
     "watch_list": [
       {
         "symbol": "ETHUSDT",
         "interval": "5m",
-        "limit": 12
+        "limit": 101
       },
       {
         "symbol": "BTCUSDT",
         "interval": "5m",
-        "limit": 12
+        "limit": 101
+      },
+      {
+        "symbol": "AAVEUSDT",
+        "interval": "5m",
+        "limit": 101
+      },
+      {
+        "symbol": "ADAUSDT",
+        "interval": "5m",
+        "limit": 101
       }
-    ]
+    ],
+    "strategy": {
+      "n_1_k": 20,
+      "n_2_k": 60
+    }
   }
 }
