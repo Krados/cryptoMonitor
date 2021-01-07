@@ -36,11 +36,7 @@ type Worker struct {
 }
 
 func (w *Worker) Listen(jobChan chan Job) {
-	for {
-		select {
-		case j := <-jobChan:
-			j.Exec()
-		default:
-		}
+	for j := range jobChan {
+		j.Exec()
 	}
 }
