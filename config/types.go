@@ -36,6 +36,13 @@ type SmaCross struct {
 }
 
 type Strategy struct {
-	Weight   decimal.Decimal `json:"weight"`
-	SmaCross SmaCross        `json:"sma_cross"`
+	Weight     decimal.Decimal `json:"weight"`
+	SmaCross   SmaCross        `json:"sma_cross"`
+	DualThrust DualThrust      `json:"dual_thrust"`
+}
+
+type DualThrust struct {
+	N1K   int             `json:"n_1_k"`
+	KUp   decimal.Decimal `json:"k_up"`
+	KDown decimal.Decimal `json:"k_down"`
 }

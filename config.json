@@ -10,42 +10,24 @@
     "watch_list": [
       {
         "symbol": "ETHUSDT",
-        "interval": "5m",
+        "interval": "1m",
         "limit": 101,
         "strategies": [
-          "sma_cross"
-        ]
-      },
-      {
-        "symbol": "BTCUSDT",
-        "interval": "5m",
-        "limit": 101,
-        "strategies": [
-          "sma_cross"
-        ]
-      },
-      {
-        "symbol": "AAVEUSDT",
-        "interval": "5m",
-        "limit": 101,
-        "strategies": [
-          "sma_cross"
-        ]
-      },
-      {
-        "symbol": "ADAUSDT",
-        "interval": "5m",
-        "limit": 101,
-        "strategies": [
-          "sma_cross"
+          "sma_cross",
+          "dual_thrust"
         ]
       }
     ],
     "strategy": {
-      "weight": "0.5",
+      "weight": "0.1",
       "sma_cross": {
         "n_1_k": 20,
         "n_2_k": 60
+      },
+      "dual_thrust": {
+        "n_1_k": 5,
+        "k_up": "0.2",
+        "k_down": "0.2"
       }
     }
   }

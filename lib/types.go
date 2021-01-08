@@ -17,6 +17,16 @@ const (
 	UnknownHold
 )
 
+const (
+	InLongStr        = "long"
+	InShortStr       = "short"
+	ConsolidationStr = "consolidation"
+	InUnknownStr     = "unknown"
+	HoldLongStr      = "hold_long"
+	HoldShortStr     = "hold_short"
+	UnknownHoldStr   = "hold_unknown"
+)
+
 type KlineData struct {
 	OpenPrice                decimal.Decimal
 	HighestPrice             decimal.Decimal
@@ -32,4 +42,28 @@ type KlineData struct {
 type DirectionPrediction struct {
 	PlaceOrderDirection int `json:"place_order_direction"`
 	HoldDirection       int `json:"hold_direction"`
+}
+
+func PlaceDirectionStr(direction int) string {
+	switch direction {
+	case InLong:
+		return InLongStr
+	case InShort:
+		return InShortStr
+	case Consolidation:
+		return ConsolidationStr
+	}
+
+	return InUnknownStr
+}
+
+func HoldDirectionStr(direction int) string {
+	switch direction {
+	case HoldLong:
+		return HoldLongStr
+	case HoldShort:
+		return HoldShortStr
+	}
+
+	return UnknownHoldStr
 }

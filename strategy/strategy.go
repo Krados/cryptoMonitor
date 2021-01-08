@@ -10,6 +10,9 @@ func NewStrategy(key string) Strategy {
 	switch key {
 	case "sma_cross":
 		return SmaCross{}
+	case "dual_thrust":
+		return DualThrust{}
 	}
+
 	return nil
 }

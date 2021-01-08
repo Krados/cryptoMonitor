@@ -2,6 +2,7 @@ package binance
 
 import (
 	"cryptoMonitor/cache"
+	"cryptoMonitor/lib"
 	"cryptoMonitor/strategy"
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
@@ -34,4 +35,6 @@ func (c CollectJob) Exec() {
 		log.Warningln(err)
 		return
 	}
+
+	log.Infof("symbol:%s, pd:%s, hd:%s", c.Symbol, lib.PlaceDirectionStr(suggestion.PlaceOrderDirection), lib.HoldDirectionStr(suggestion.HoldDirection))
 }
