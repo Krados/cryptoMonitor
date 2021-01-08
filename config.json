@@ -11,7 +11,7 @@
       {
         "symbol": "ETHUSDT",
         "interval": "1m",
-        "limit": 122,
+        "limit": 242,
         "strategies": [
           "sma_cross",
           "dual_thrust",
