@@ -11,15 +11,16 @@
       {
         "symbol": "ETHUSDT",
         "interval": "1m",
-        "limit": 101,
+        "limit": 122,
         "strategies": [
           "sma_cross",
-          "dual_thrust"
+          "dual_thrust",
+          "basic_status"
         ]
       }
     ],
     "strategy": {
-      "weight": "0.1",
+      "weight": "0.6",
       "sma_cross": {
         "n_1_k": 20,
         "n_2_k": 60
@@ -28,6 +29,9 @@
         "n_1_k": 5,
         "k_up": "0.2",
         "k_down": "0.2"
+      },
+      "basic_status": {
+        "nk": 120
       }
     }
   }

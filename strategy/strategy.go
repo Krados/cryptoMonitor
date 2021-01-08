@@ -12,6 +12,8 @@ func NewStrategy(key string) Strategy {
 		return SmaCross{}
 	case "dual_thrust":
 		return DualThrust{}
+	case "basic_status":
+		return BasicStatus{}
 	}
 
 	return nil
