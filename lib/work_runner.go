@@ -19,7 +19,7 @@ func NewWorkRunner(workLimit int) *WorkRunner {
 func (w *WorkRunner) Receive(work Work) (err error) {
 	select {
 	case w.WorkChan <- work:
-		w.run(work)
+		go w.run(work)
 	default:
 		err = errors.New("work list is full")
 	}
