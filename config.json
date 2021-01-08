@@ -3,9 +3,9 @@
     "name": "binance",
     "interval": 1000000000,
     "api_setting": {
-      "base": "https://api3.binance.com",
-      "kline_uri": "/api/v3/klines",
-      "latest_price_uri": "/api/v3/ticker/price"
+      "base": "https://fapi.binance.com",
+      "kline_uri": "/fapi/v1/klines",
+      "latest_price_uri": "/fapi/v1/ticker/price"
     },
     "watch_list": [
       {

@@ -36,5 +36,16 @@ func (c CollectJob) Exec() {
 		return
 	}
 
-	log.Infof("symbol:%s, pd:%s, hd:%s", c.Symbol, lib.PlaceDirectionStr(suggestion.PlaceOrderDirection), lib.HoldDirectionStr(suggestion.HoldDirection))
+	log.Infof("symbol:%s, pd:%s, hd:%s, price:%v",
+		c.Symbol, lib.PlaceDirectionStr(suggestion.PlaceOrderDirection),
+		lib.HoldDirectionStr(suggestion.HoldDirection), kLines[len(kLines)-1].ClosePrice)
+
+	if suggestion.PlaceOrderDirection == lib.InUnknown {
+		return
+	}
+
+	err = GetRunner().Receive(ProfitWork{})
+	if err != nil {
+		log.Warnf("%s", err)
+	}
 }
