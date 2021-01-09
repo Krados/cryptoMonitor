@@ -40,9 +40,9 @@ func (m KlineMonitor) Run() {
 
 func (m KlineMonitor) GetKlineDataInterval(symbol string, interval string, limit int, strategies []string) {
 	ticker := time.NewTicker(m.Interval)
+	reqUrl := fmt.Sprintf("%s%s?symbol=%s&interval=%s&limit=%d",
+		m.BaseURL, m.KlineURI, symbol, interval, limit)
 	for range ticker.C {
-		reqUrl := fmt.Sprintf("%s%s?symbol=%s&interval=%s&limit=%d",
-			m.BaseURL, m.KlineURI, symbol, interval, limit)
 		kResp, err := GetKlineData(reqUrl)
 		if err != nil {
 			log.Warningln(err)
