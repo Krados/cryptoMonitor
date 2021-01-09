@@ -44,8 +44,15 @@ func (c CollectJob) Exec() {
 		return
 	}
 
-	err = GetRunner().Receive(ProfitWork{})
-	if err != nil {
-		log.Warnf("%s", err)
+	if suggestion.PlaceOrderDirection == lib.InLong {
+		err = GetRunner().Receive(SimulateLongOrder{})
+		if err != nil {
+			log.Warnf("simulate long order failed , symbol:%s err:%s", c.Symbol, err)
+		}
+	} else if suggestion.PlaceOrderDirection == lib.InShort {
+		err = GetRunner().Receive(SimulateShortOrder{})
+		if err != nil {
+			log.Warnf("simulate short order failed , symbol:%s err:%s", c.Symbol, err)
+		}
 	}
 }
