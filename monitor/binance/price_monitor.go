@@ -45,7 +45,7 @@ func (m PriceMonitor) GetPriceAndSet(reqUrl string) (err error) {
 		return
 	}
 	for _, val := range pResp {
-		_Price.LoadOrStore(val.Symbol, val.Price)
+		_Price.Store(val.Symbol, val.Price)
 	}
 
 	return
