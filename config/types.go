@@ -23,12 +23,13 @@ type WatchList struct {
 }
 
 type DataSource struct {
-	Name        string        `json:"name"`
-	Interval    time.Duration `json:"interval"`
-	LogFileName string        `json:"log_file_name"`
-	APISetting  APISetting    `json:"api_setting"`
-	WatchList   []WatchList   `json:"watch_list"`
-	Strategy    Strategy      `json:"strategy"`
+	Name           string         `json:"name"`
+	Interval       time.Duration  `json:"interval"`
+	LogFileName    string         `json:"log_file_name"`
+	APISetting     APISetting     `json:"api_setting"`
+	WatchList      []WatchList    `json:"watch_list"`
+	Strategy       Strategy       `json:"strategy"`
+	ProfitStrategy ProfitStrategy `json:"profit_strategy"`
 }
 
 type SmaCross struct {
@@ -51,4 +52,9 @@ type DualThrust struct {
 
 type BasicStatus struct {
 	NK int `json:"nk"`
+}
+
+type ProfitStrategy struct {
+	LongR  decimal.Decimal `json:"long_r"`
+	ShortR decimal.Decimal `json:"short_r"`
 }

@@ -34,6 +34,10 @@
       "basic_status": {
         "nk": 120
       }
+    },
+    "profit_strategy": {
+      "long_r": "1.05",
+      "short_r": "1.05"
     }
   }
 }

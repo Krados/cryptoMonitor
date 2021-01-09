@@ -45,7 +45,10 @@ func (c CollectJob) Exec() {
 	}
 
 	if suggestion.PlaceOrderDirection == lib.InLong {
-		err = GetRunner().Receive(SimulateLongOrder{})
+		err = GetRunner().Receive(SimulateLongOrder{
+			EnterPrice: kLines[len(kLines)-1].ClosePrice,
+			Symbol:     c.Symbol,
+		})
 		if err != nil {
 			log.Warnf("simulate long order failed , symbol:%s err:%s", c.Symbol, err)
 		}
