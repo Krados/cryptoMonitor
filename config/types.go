@@ -23,11 +23,12 @@ type WatchList struct {
 }
 
 type DataSource struct {
-	Name       string        `json:"name"`
-	Interval   time.Duration `json:"interval"`
-	APISetting APISetting    `json:"api_setting"`
-	WatchList  []WatchList   `json:"watch_list"`
-	Strategy   Strategy      `json:"strategy"`
+	Name        string        `json:"name"`
+	Interval    time.Duration `json:"interval"`
+	LogFileName string        `json:"log_file_name"`
+	APISetting  APISetting    `json:"api_setting"`
+	WatchList   []WatchList   `json:"watch_list"`
+	Strategy    Strategy      `json:"strategy"`
 }
 
 type SmaCross struct {

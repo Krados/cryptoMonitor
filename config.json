@@ -2,6 +2,7 @@
   "data_source": {
     "name": "binance",
     "interval": 1000000000,
+    "log_file_name": "binance.log",
     "api_setting": {
       "base": "https://fapi.binance.com",
       "kline_uri": "/fapi/v1/klines",
