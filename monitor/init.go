@@ -4,5 +4,5 @@ import "cryptoMonitor/monitor/binance"
 
 func Start() {
 	binance.InitRunner()
-	binance.NewMonitor().Run()
+	binance.NewKlineMonitor().Run()
 }
