@@ -36,7 +36,7 @@ func (c CollectJob) Exec() {
 		return
 	}
 
-	log.Infof("symbol:%s, pd:%s, hd:%s, price:%v",
+	log.Debugf("symbol:%s, pd:%s, hd:%s, price:%v",
 		c.Symbol, lib.PlaceDirectionStr(suggestion.PlaceOrderDirection),
 		lib.HoldDirectionStr(suggestion.HoldDirection), kLines[len(kLines)-1].ClosePrice)
 

@@ -24,7 +24,7 @@ func Init() (err error) {
 	mw := io.MultiWriter(os.Stdout, f)
 	log.SetOutput(mw)
 	log.SetFormatter(&log.JSONFormatter{})
-	log.SetLevel(log.DebugLevel)
+	log.SetLevel(log.InfoLevel)
 
 	return
 }
