@@ -36,8 +36,8 @@
       }
     },
     "profit_strategy": {
-      "long_r": "1.05",
-      "short_r": "1.05"
+      "long_r": "0.0005",
+      "short_r": "0.85"
     }
   }
 }

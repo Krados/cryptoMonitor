@@ -17,6 +17,8 @@ func (s SimulateLongOrder) Action() {
 	orderUUID := uuid.NewV4()
 	var triggerPrice decimal.Decimal
 	var tmpPriceForTrigger decimal.Decimal
+
+	// waiting for trigger price
 	for {
 		val, ok := GetPriceMap().Load(s.Symbol)
 		if !ok {
@@ -29,42 +31,43 @@ func (s SimulateLongOrder) Action() {
 		}
 		time.Sleep(time.Second)
 	}
+	triggerAt := time.Now()
 
+	// waiting for (priceMax - priceNow) < priceMax * LongR
 	priceMax := decimal.New(0, 0)
-	priceMin := decimal.New(0, 0)
-	var tmpPrice decimal.Decimal
-	var tmpForMaxSubTrigger decimal.Decimal
+	var priceNow decimal.Decimal
+	var tmpForMaxSubNow decimal.Decimal
 	var tmpMaxMulR decimal.Decimal
-	var tmpMinMulR decimal.Decimal
+	shortR := config.Get().DataSource.ProfitStrategy.ShortR
+	longR := config.Get().DataSource.ProfitStrategy.LongR
+	triggerMulShortR := triggerPrice.Mul(shortR)
 	for {
 		val, ok := GetPriceMap().Load(s.Symbol)
 		if !ok {
 			continue
 		}
-		tmpPrice = val.(decimal.Decimal)
-		if tmpPrice.GreaterThan(priceMax) {
-			priceMax = tmpPrice
-		}
-		if priceMin.LessThan(tmpPrice) {
-			priceMin = tmpPrice
+		priceNow = val.(decimal.Decimal)
+		if priceNow.GreaterThan(priceMax) {
+			priceMax = priceNow
 		}
 
 		// out the order cuz long enough
-		tmpForMaxSubTrigger = priceMax.Sub(tmpPrice)
-		tmpMaxMulR = priceMax.Mul(config.Get().DataSource.ProfitStrategy.LongR)
-		if tmpForMaxSubTrigger.LessThan(tmpMaxMulR) {
-			log.Infof("uuid:%s symbol:%s enterPrice:%s priceCurr:%s triggerPrice:%s priceMax:%s longR:%s",
-				orderUUID, s.Symbol, s.EnterPrice, tmpPrice,
-				triggerPrice, priceMax, config.Get().DataSource.ProfitStrategy.LongR)
+		tmpForMaxSubNow = priceMax.Sub(priceNow)
+		tmpMaxMulR = priceMax.Mul(longR)
+		if !tmpForMaxSubNow.IsZero() && tmpForMaxSubNow.LessThan(tmpMaxMulR) {
+			log.Infof("triggerAt:%s uuid:%s symbol:%s enterPrice:%s priceNow:%s "+
+				"triggerPrice:%s priceMax:%s tmpForMaxSubNow:%s tmpMaxMulR:%s longR:%s",
+				triggerAt, orderUUID, s.Symbol, s.EnterPrice, priceNow,
+				triggerPrice, priceMax, tmpForMaxSubNow, tmpMaxMulR, longR)
 			break
 		}
 
 		// out the order cuz short enough
-		tmpMinMulR = priceMin.Mul(config.Get().DataSource.ProfitStrategy.ShortR)
-		if tmpMinMulR.GreaterThan(tmpPrice) {
-			log.Infof("uuid:%s symbol:%s enterPrice:%s priceCurr:%s triggerPrice:%s priceMin:%s shortR:%s",
-				orderUUID, s.Symbol, s.EnterPrice, tmpPrice,
-				triggerPrice, priceMin, config.Get().DataSource.ProfitStrategy.ShortR)
+		if priceNow.LessThan(triggerMulShortR) {
+			log.Infof("triggerAt:%s uuid:%s symbol:%s enterPrice:%s priceNow:%s "+
+				"triggerPrice:%s triggerMulShortR:%s shortR:%s",
+				triggerAt, orderUUID, s.Symbol, s.EnterPrice, priceNow,
+				triggerPrice, triggerMulShortR, shortR)
 			break
 		}
 
