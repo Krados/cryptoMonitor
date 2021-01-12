@@ -6,10 +6,15 @@ import (
 	"net/http"
 )
 
-func SendRequest(method string, reqUrl string, body io.Reader) (dataByte []byte, err error) {
+func SendRequest(method, reqUrl string, body io.Reader, headers map[string]string) (dataByte []byte, err error) {
 	req, err := http.NewRequest(method, reqUrl, body)
 	if err != nil {
 		return
+	}
+	if len(headers) != 0 {
+		for key, val := range headers {
+			req.Header.Set(key, val)
+		}
 	}
 	client := &http.Client{}
 	resp, err := client.Do(req)
