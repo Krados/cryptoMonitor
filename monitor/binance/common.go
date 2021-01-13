@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"time"
 )
 
 func GetKlineData(reqUrl string) (kResp KlineResp, err error) {
@@ -58,7 +57,7 @@ func SendOrder(
 	urlValues.Set("price", price)
 	urlValues.Set("timeInForce", timeInForce)
 	urlValues.Set("recvWindow", recvWindow)
-	urlValues.Set("timestamp", fmt.Sprintf("%d", NowInMilliSecond()))
+	urlValues.Set("timestamp", fmt.Sprintf("%d", lib.NowInMilliSecond()))
 	key := config.Get().DataSource.APIKey
 	secret := config.Get().DataSource.APISecret
 
@@ -87,8 +86,4 @@ func SendOrder(
 	orderResp = tmpOrderResp
 
 	return
-}
-
-func NowInMilliSecond() int64 {
-	return time.Now().UnixNano() / int64(time.Millisecond)
 }
