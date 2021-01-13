@@ -120,3 +120,35 @@ func OpenOrder(symbol string) (openOrderResp OpenOrderResp, err error) {
 
 	return
 }
+
+func Balance() (balanceResp []BalanceResp, err error) {
+	// prepare url values
+	urlValues := url.Values{}
+	urlValues.Set("timestamp", fmt.Sprintf("%d", lib.NowInMilliSecond()))
+
+	// add key to header
+	m := make(map[string]string)
+	m["X-MBX-APIKEY"] = config.Get().DataSource.APIKey
+
+	// hmac sha256 payload
+	payload := urlValues.Encode()
+	sha := lib.HmacSha256(config.Get().DataSource.APISecret, payload)
+
+	// get balance
+	reqUrl := fmt.Sprintf("%s/fapi/v2/balance?%s&signature=%s",
+		config.Get().DataSource.APISetting.Base, payload, sha)
+	dataByte, err := lib.SendRequest(http.MethodGet, reqUrl, nil, m)
+	if err != nil {
+		return
+	}
+
+	// unmarshal
+	var tmpBalanceResp []BalanceResp
+	err = json.Unmarshal(dataByte, &tmpBalanceResp)
+	if err != nil {
+		return
+	}
+	balanceResp = tmpBalanceResp
+
+	return
+}

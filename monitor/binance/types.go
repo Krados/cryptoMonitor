@@ -60,3 +60,13 @@ type OpenOrderResp struct {
 	WorkingType   string          `json:"workingType"`
 	PriceProtect  bool            `json:"priceProtect"`
 }
+
+type BalanceResp struct {
+	AccountAlias       string          `json:"accountAlias"`
+	Asset              string          `json:"asset"`
+	Balance            decimal.Decimal `json:"balance"`
+	CrossWalletBalance decimal.Decimal `json:"crossWalletBalance"`
+	CrossUnPnl         decimal.Decimal `json:"crossUnPnl"`
+	AvailableBalance   decimal.Decimal `json:"availableBalance"`
+	MaxWithdrawAmount  decimal.Decimal `json:"maxWithdrawAmount"`
+}
