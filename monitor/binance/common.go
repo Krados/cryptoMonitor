@@ -1,11 +1,8 @@
 package binance
 
 import (
-	"crypto/hmac"
-	"crypto/sha256"
 	"cryptoMonitor/config"
 	"cryptoMonitor/lib"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -71,9 +68,7 @@ func SendOrder(
 
 	// hmac sha256 payload
 	payload := urlValues.Encode()
-	h := hmac.New(sha256.New, []byte(secret))
-	h.Write([]byte(payload))
-	sha := hex.EncodeToString(h.Sum(nil))
+	sha := lib.HmacSha256(secret, payload)
 
 	// send order
 	reqUrl := fmt.Sprintf("%s/fapi/v1/order/test?%s&signature=%s",
