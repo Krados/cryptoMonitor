@@ -102,7 +102,7 @@ func OpenOrder(symbol string) (openOrderResp OpenOrderResp, err error) {
 	payload := urlValues.Encode()
 	sha := lib.HmacSha256(config.Get().DataSource.APISecret, payload)
 
-	// send order
+	// get open order
 	reqUrl := fmt.Sprintf("%s/fapi/v1/openOrder?%s&signature=%s",
 		config.Get().DataSource.APISetting.Base, payload, sha)
 	dataByte, err := lib.SendRequest(http.MethodGet, reqUrl, nil, m)

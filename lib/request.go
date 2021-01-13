@@ -1,6 +1,8 @@
 package lib
 
 import (
+	"encoding/json"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -26,6 +28,15 @@ func SendRequest(method, reqUrl string, body io.Reader, headers map[string]strin
 	if err != nil {
 		return
 	}
+
+	// make sure resp no error
+	var errorResp ErrorResp
+	err = json.Unmarshal(tmpDataByte, &errorResp)
+	if err == nil {
+		err = errors.New(string(tmpDataByte))
+		return
+	}
+
 	dataByte = tmpDataByte
 
 	return
