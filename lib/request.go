@@ -31,8 +31,8 @@ func SendRequest(method, reqUrl string, body io.Reader, headers map[string]strin
 
 	// make sure resp no error
 	var errorResp ErrorResp
-	err = json.Unmarshal(tmpDataByte, &errorResp)
-	if err == nil {
+	tryErr := json.Unmarshal(tmpDataByte, &errorResp)
+	if tryErr == nil {
 		err = errors.New(string(tmpDataByte))
 		return
 	}
