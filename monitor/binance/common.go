@@ -70,7 +70,7 @@ func SendOrder(
 	sha := lib.HmacSha256(secret, payload)
 
 	// send order
-	reqUrl := fmt.Sprintf("%s/fapi/v1/order/test?%s&signature=%s",
+	reqUrl := fmt.Sprintf("%s/fapi/v1/order?%s&signature=%s",
 		config.Get().DataSource.APISetting.Base, payload, sha)
 	dataByte, err := lib.SendRequest(http.MethodPost, reqUrl, nil, m)
 	if err != nil {
@@ -84,6 +84,39 @@ func SendOrder(
 		return
 	}
 	orderResp = tmpOrderResp
+
+	return
+}
+
+func OpenOrder(symbol string) (openOrderResp OpenOrderResp, err error) {
+	// prepare url values
+	urlValues := url.Values{}
+	urlValues.Set("symbol", symbol)
+	urlValues.Set("timestamp", fmt.Sprintf("%d", lib.NowInMilliSecond()))
+
+	// add key to header
+	m := make(map[string]string)
+	m["X-MBX-APIKEY"] = config.Get().DataSource.APIKey
+
+	// hmac sha256 payload
+	payload := urlValues.Encode()
+	sha := lib.HmacSha256(config.Get().DataSource.APISecret, payload)
+
+	// send order
+	reqUrl := fmt.Sprintf("%s/fapi/v1/openOrder?%s&signature=%s",
+		config.Get().DataSource.APISetting.Base, payload, sha)
+	dataByte, err := lib.SendRequest(http.MethodGet, reqUrl, nil, m)
+	if err != nil {
+		return
+	}
+
+	// unmarshal
+	var tmpOpenOrderResp OpenOrderResp
+	err = json.Unmarshal(dataByte, &tmpOpenOrderResp)
+	if err != nil {
+		return
+	}
+	openOrderResp = tmpOpenOrderResp
 
 	return
 }
