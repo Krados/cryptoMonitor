@@ -8,24 +8,13 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
 )
 
 func GetKlineData(reqUrl string) (kResp KlineResp, err error) {
-	req, err := http.NewRequest("GET", reqUrl, nil)
-	if err != nil {
-		return
-	}
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	dataByte, err := ioutil.ReadAll(resp.Body)
+	dataByte, err := lib.SendRequest(http.MethodGet, reqUrl, nil, nil)
 	if err != nil {
 		return
 	}
@@ -40,17 +29,7 @@ func GetKlineData(reqUrl string) (kResp KlineResp, err error) {
 }
 
 func GetLatestPrice(reqUrl string) (priceResp []LatestPriceResp, err error) {
-	req, err := http.NewRequest("GET", reqUrl, nil)
-	if err != nil {
-		return
-	}
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	dataByte, err := ioutil.ReadAll(resp.Body)
+	dataByte, err := lib.SendRequest(http.MethodGet, reqUrl, nil, nil)
 	if err != nil {
 		return
 	}
