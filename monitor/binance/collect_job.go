@@ -54,13 +54,12 @@ func (c CollectJob) Exec() {
 		if val != lib.InUnknown {
 			return
 		}
-		SetSignal(c.Symbol, lib.InShort)
+		SetSignal(c.Symbol, lib.InLong)
 		err = GetRunner().Receive(SimulateLongOrder{
-			EnterPrice: kLines[len(kLines)-1].ClosePrice,
-			Symbol:     c.Symbol,
+			Symbol: c.Symbol,
 		})
 		if err != nil {
-			log.Warnf("simulate long order failed , symbol:%s err:%s", c.Symbol, err)
+			log.Debugf("simulate long order failed , symbol:%s err:%s", c.Symbol, err)
 		}
 	} else if suggestion.PlaceOrderDirection == lib.InShort {
 		val, err := GetSignal(c.Symbol)
@@ -73,11 +72,10 @@ func (c CollectJob) Exec() {
 		}
 		SetSignal(c.Symbol, lib.InShort)
 		err = GetRunner().Receive(SimulateShortOrder{
-			EnterPrice: kLines[len(kLines)-1].ClosePrice,
-			Symbol:     c.Symbol,
+			Symbol: c.Symbol,
 		})
 		if err != nil {
-			log.Warnf("simulate short order failed , symbol:%s err:%s", c.Symbol, err)
+			log.Debugf("simulate short order failed , symbol:%s err:%s", c.Symbol, err)
 		}
 	}
 }
