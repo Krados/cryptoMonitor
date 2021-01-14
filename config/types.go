@@ -6,7 +6,8 @@ import (
 )
 
 type Config struct {
-	DataSource DataSource `json:"data_source"`
+	DataSource  DataSource  `json:"data_source"`
+	TelegramBot TelegramBot `json:"telegram_bot"`
 }
 
 type APISetting struct {
@@ -63,4 +64,9 @@ type ProfitStrategy struct {
 	LossTick  decimal.Decimal `json:"loss_tick"`
 	LongTick  decimal.Decimal `json:"long_tick"`
 	ShortTick decimal.Decimal `json:"short_tick"`
+}
+
+type TelegramBot struct {
+	APIToken string `json:"api_token"`
+	ChatId   int64  `json:"chat_id"`
 }

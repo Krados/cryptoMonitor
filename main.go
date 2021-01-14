@@ -6,6 +6,7 @@ import (
 	"cryptoMonitor/config"
 	logger "cryptoMonitor/log"
 	"cryptoMonitor/monitor"
+	"cryptoMonitor/service"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"os/signal"
@@ -21,6 +22,12 @@ func main() {
 
 	// init logger
 	if err := logger.Init(); err != nil {
+		log.Fatalln(err)
+		return
+	}
+
+	// init service
+	if err := service.Init(); err != nil {
 		log.Fatalln(err)
 		return
 	}

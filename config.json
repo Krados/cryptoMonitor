@@ -45,5 +45,9 @@
       "long_tick": "2.5",
       "short_tick": "2.5"
     }
+  },
+  "telegram_bot": {
+    "api_token": "API_TOKEN",
+    "chat_id": 0
   }
 }
