@@ -60,4 +60,5 @@ type BasicStatus struct {
 type ProfitStrategy struct {
 	LongR  decimal.Decimal `json:"long_r"`
 	ShortR decimal.Decimal `json:"short_r"`
+	Tick   decimal.Decimal `json:"tick"`
 }
