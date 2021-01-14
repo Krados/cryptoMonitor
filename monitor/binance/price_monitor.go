@@ -25,7 +25,7 @@ func NewPriceMonitor() PriceMonitor {
 }
 
 func (m PriceMonitor) Run() {
-	ticker := time.NewTicker(m.Interval)
+	ticker := time.NewTicker(time.Millisecond * 250)
 	reqUrl := fmt.Sprintf("%s%s", m.BaseURL, m.LatestPriceURI)
 	go func() {
 		for range ticker.C {

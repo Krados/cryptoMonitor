@@ -18,14 +18,15 @@ func (s DualThrust) Calculate(data []lib.KlineData) (prediction lib.DirectionPre
 	maxC := s.MaxClose(n, data)
 	minC := s.MinClose(n, data)
 	latestK := data[len(data)-1]
+	latestK_1 := data[len(data)-2]
 	channelRange := s.ChannelRange(maxH, minL, maxC, minC)
 	channelUp := s.ChannelUp(latestK.OpenPrice, channelRange, kUp)
 	channelDown := s.ChannelDown(latestK.OpenPrice, channelRange, kDown)
 
-	if latestK.ClosePrice.GreaterThan(channelUp) {
+	if latestK.ClosePrice.GreaterThan(channelUp) && latestK_1.ClosePrice.LessThan(channelUp) {
 		prediction.PlaceOrderDirection = lib.InLong
 		prediction.HoldDirection = lib.UnknownHold
-	} else if latestK.ClosePrice.LessThan(channelDown) {
+	} else if latestK.ClosePrice.LessThan(channelDown) && latestK_1.ClosePrice.GreaterThan(channelDown) {
 		prediction.PlaceOrderDirection = lib.InShort
 		prediction.HoldDirection = lib.UnknownHold
 	} else {

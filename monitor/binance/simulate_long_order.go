@@ -15,62 +15,51 @@ type SimulateLongOrder struct {
 
 func (s SimulateLongOrder) Action() {
 	orderUUID := uuid.NewV4()
-	var triggerPrice decimal.Decimal
-	var tmpPriceForTrigger decimal.Decimal
-
-	// waiting for trigger price
-	for {
-		val, ok := GetPriceMap().Load(s.Symbol)
-		if !ok {
-			continue
-		}
-		tmpPriceForTrigger = val.(decimal.Decimal)
-		if tmpPriceForTrigger.GreaterThan(s.EnterPrice) {
-			triggerPrice = tmpPriceForTrigger
-			break
-		}
-		time.Sleep(time.Second)
-	}
-	triggerAt := time.Now()
-
-	// waiting for (priceMax - priceNow) < priceMax * LongR
-	priceMax := decimal.New(0, 0)
-	var priceNow decimal.Decimal
-	var tmpForMaxSubNow decimal.Decimal
-	var tmpMaxMulR decimal.Decimal
-	shortR := config.Get().DataSource.ProfitStrategy.ShortR
+	pMax := decimal.New(0, 0)
+	tick := config.Get().DataSource.ProfitStrategy.Tick
+	pMin := s.EnterPrice.Sub(tick)
+	pNow := decimal.New(0, 0)
 	longR := config.Get().DataSource.ProfitStrategy.LongR
-	triggerMulShortR := triggerPrice.Mul(shortR)
+	log.Infof("signal:long start uuid:%s symbol:%s pE:%s", orderUUID, s.Symbol, s.EnterPrice)
+
 	for {
-		val, ok := GetPriceMap().Load(s.Symbol)
+		tmp, ok := GetPriceMap().Load(s.Symbol)
 		if !ok {
 			continue
 		}
-		priceNow = val.(decimal.Decimal)
-		if priceNow.GreaterThan(priceMax) {
-			priceMax = priceNow
+		pNow = tmp.(decimal.Decimal)
+		if pNow.GreaterThan(pMax) {
+			pMax = pNow
 		}
-
-		// out the order cuz long enough
-		tmpForMaxSubNow = priceMax.Sub(priceNow)
-		tmpMaxMulR = priceMax.Mul(longR)
-		if !tmpForMaxSubNow.IsZero() && tmpForMaxSubNow.LessThan(tmpMaxMulR) {
-			log.Infof("triggerAt:%s uuid:%s symbol:%s enterPrice:%s priceNow:%s "+
-				"triggerPrice:%s priceMax:%s tmpForMaxSubNow:%s tmpMaxMulR:%s longR:%s",
-				triggerAt, orderUUID, s.Symbol, s.EnterPrice, priceNow,
-				triggerPrice, priceMax, tmpForMaxSubNow, tmpMaxMulR, longR)
-			break
+		if !pMax.IsZero() {
+			tmp := pMax.Sub(s.EnterPrice)
+			tmp = tmp.Mul(longR)
+			tmp = tmp.Add(s.EnterPrice)
+			if pNow.LessThanOrEqual(tmp) && pNow.GreaterThan(s.EnterPrice.Add(tick.Div(decimal.New(2, 0)))) {
+				word := ""
+				if pNow.GreaterThan(s.EnterPrice) {
+					word = "enough"
+				} else {
+					word = "insufficient"
+				}
+				log.Infof("signal:long win %s uuid:%s symbol:%s pE:%s pMax:%s pNow:%s",
+					word, orderUUID, s.Symbol, s.EnterPrice, pMax, pNow)
+				FinalBalance.Lock()
+				FinalBalance.Value = FinalBalance.Value.Add(pNow.Sub(s.EnterPrice))
+				FinalBalance.Unlock()
+				break
+			}
 		}
-
-		// out the order cuz short enough
-		if priceNow.LessThan(triggerMulShortR) {
-			log.Infof("triggerAt:%s uuid:%s symbol:%s enterPrice:%s priceNow:%s "+
-				"triggerPrice:%s triggerMulShortR:%s shortR:%s",
-				triggerAt, orderUUID, s.Symbol, s.EnterPrice, priceNow,
-				triggerPrice, triggerMulShortR, shortR)
+		if pNow.LessThanOrEqual(pMin) {
+			log.Infof("signal:long lose uuid:%s symbol:%s pE:%s pMin:%s pNow:%s",
+				orderUUID, s.Symbol, s.EnterPrice, pMin, pNow)
+			FinalBalance.Lock()
+			FinalBalance.Value = FinalBalance.Value.Add(pNow.Sub(s.EnterPrice))
+			FinalBalance.Unlock()
 			break
 		}
 
 		time.Sleep(time.Second)
 	}
+	log.Infof("final balance:%s", FinalBalance.Value)
 }
