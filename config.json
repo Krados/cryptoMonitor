@@ -4,8 +4,8 @@
     "interval": 1000000000,
     "log_file_name": "binance.log",
     "trade_runner_num": 1,
-    "api_key": "fdBep5QTCu4ZRaLAxfHmf0zh6smSfFfCCcPScxngkJJFMhMr65bwjrpyRtd0RyJT",
-    "api_secret": "mCo2lmnJMmrbW3hGa14gunzZD48DDQigVh10Rrwuby6lvIY02khslpWgePfLbssu",
+    "api_key": "API_KEY",
+    "api_secret": "API_SECRET",
     "api_setting": {
       "base": "https://fapi.binance.com",
       "kline_uri": "/fapi/v1/klines",
