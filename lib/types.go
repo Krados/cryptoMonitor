@@ -44,11 +44,6 @@ type DirectionPrediction struct {
 	HoldDirection       int `json:"hold_direction"`
 }
 
-type ErrorResp struct {
-	Code int    `json:"code"`
-	Msg  string `json:"msg"`
-}
-
 func PlaceDirectionStr(direction int) string {
 	switch direction {
 	case InLong:
