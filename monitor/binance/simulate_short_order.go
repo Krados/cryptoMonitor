@@ -2,6 +2,8 @@ package binance
 
 import (
 	"cryptoMonitor/config"
+	"cryptoMonitor/service"
+	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
@@ -63,7 +65,9 @@ func (s SimulateShortOrder) Action() {
 
 	s.EnterPrice = currentOrder.AvgPrice
 	pMax := s.EnterPrice.Add(lossTick)
-	log.Infof("signal:short start uuid:%s symbol:%s pE:%s", orderUUID, s.Symbol, s.EnterPrice)
+	tmpMsg := fmt.Sprintf("signal:short start uuid:%s symbol:%s pE:%s", orderUUID, s.Symbol, s.EnterPrice)
+	service.GetTelegramBot().SendMessage(tmpMsg)
+	log.Info(tmpMsg)
 	for {
 		tmp, ok := GetPriceMap().Load(s.Symbol)
 		if !ok {
@@ -83,8 +87,10 @@ func (s SimulateShortOrder) Action() {
 					return
 				}
 				log.Infof("%v", outOrder)
-				log.Infof("signal:short win uuid:%s symbol:%s pE:%s pMax:%s pNow:%s",
+				tmpMsg := fmt.Sprintf("signal:short win uuid:%s symbol:%s pE:%s pMax:%s pNow:%s",
 					orderUUID, s.Symbol, s.EnterPrice, pMax, pNow)
+				service.GetTelegramBot().SendMessage(tmpMsg)
+				log.Info(tmpMsg)
 				break
 			}
 		}
@@ -95,8 +101,10 @@ func (s SimulateShortOrder) Action() {
 				return
 			}
 			log.Infof("%v", outOrder)
-			log.Infof("signal:short lose uuid:%s symbol:%s pE:%s pMin:%s pNow:%s",
+			tmpMsg := fmt.Sprintf("signal:short lose uuid:%s symbol:%s pE:%s pMin:%s pNow:%s",
 				orderUUID, s.Symbol, s.EnterPrice, pMin, pNow)
+			service.GetTelegramBot().SendMessage(tmpMsg)
+			log.Infof(tmpMsg)
 			break
 		}
 		time.Sleep(time.Millisecond * 500)
