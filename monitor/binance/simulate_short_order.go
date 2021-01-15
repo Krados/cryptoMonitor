@@ -11,21 +11,21 @@ import (
 
 type SimulateShortOrder struct {
 	EnterPrice decimal.Decimal
-	Symbol     string
+	WatchList  config.WatchList
 }
 
 func (s SimulateShortOrder) Action() {
 	orderUUID := uuid.NewV4()
 	pMin := decimal.New(0, 0)
-	lossTick := config.Get().DataSource.ProfitStrategy.LossTick
-	shortTick := config.Get().DataSource.ProfitStrategy.ShortTick
+	lossTick := s.WatchList.ProfitStrategy.LossTick
+	shortTick := s.WatchList.ProfitStrategy.ShortTick
 	pNow := decimal.New(0, 0)
-	shortR := config.Get().DataSource.ProfitStrategy.ShortR
+	shortR := s.WatchList.ProfitStrategy.ShortR
 	pMax := s.EnterPrice.Add(lossTick)
-	tmpMsg := fmt.Sprintf("signal:short start uuid:%s symbol:%s pE:%s", orderUUID, s.Symbol, s.EnterPrice)
+	tmpMsg := fmt.Sprintf("signal:short start uuid:%s symbol:%s pE:%s", orderUUID, s.WatchList.Symbol, s.EnterPrice)
 	log.Info(tmpMsg)
 	for {
-		tmp, ok := GetPriceMap().Load(s.Symbol)
+		tmp, ok := GetPriceMap().Load(s.WatchList.Symbol)
 		if !ok {
 			continue
 		}
@@ -38,14 +38,14 @@ func (s SimulateShortOrder) Action() {
 			tmpI = tmpI.Mul(shortR)
 			if tmpI.GreaterThanOrEqual(s.EnterPrice.Sub(pNow)) {
 				tmpMsg := fmt.Sprintf("signal:short win uuid:%s symbol:%s pE:%s pMax:%s pNow:%s",
-					orderUUID, s.Symbol, s.EnterPrice, pMax, pNow)
+					orderUUID, s.WatchList.Symbol, s.EnterPrice, pMax, pNow)
 				log.Info(tmpMsg)
 				break
 			}
 		}
 		if pNow.GreaterThanOrEqual(pMax) {
 			tmpMsg := fmt.Sprintf("signal:short lose uuid:%s symbol:%s pE:%s pMin:%s pNow:%s",
-				orderUUID, s.Symbol, s.EnterPrice, pMin, pNow)
+				orderUUID, s.WatchList.Symbol, s.EnterPrice, pMin, pNow)
 			log.Infof(tmpMsg)
 			break
 		}

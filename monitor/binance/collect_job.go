@@ -2,6 +2,7 @@ package binance
 
 import (
 	"cryptoMonitor/cache"
+	"cryptoMonitor/config"
 	"cryptoMonitor/lib"
 	"cryptoMonitor/strategy"
 	"encoding/json"
@@ -9,10 +10,8 @@ import (
 )
 
 type CollectJob struct {
-	KResp      KlineResp
-	PResp      LatestPriceResp
-	Symbol     string
-	Strategies []string
+	KResp     KlineResp
+	WatchList config.WatchList
 }
 
 func (c CollectJob) Exec() {
@@ -22,9 +21,9 @@ func (c CollectJob) Exec() {
 		return
 	}
 	exec := strategy.NewStrategyExecutioner().
-		SetKline(kLines).SetStrategy(c.Strategies)
+		SetKline(kLines).SetStrategy(c.WatchList.Strategies)
 	suggestion := exec.Exec()
-	keyByte := []byte(c.Symbol)
+	keyByte := []byte(c.WatchList.Symbol)
 	dataByte, err := json.Marshal(suggestion)
 	if err != nil {
 		log.Warningln(err)
@@ -36,17 +35,18 @@ func (c CollectJob) Exec() {
 		return
 	}
 
-	log.Debugf("symbol:%s, pd:%s, hd:%s, price:%v",
-		c.Symbol, lib.PlaceDirectionStr(suggestion.PlaceOrderDirection),
-		lib.HoldDirectionStr(suggestion.HoldDirection), kLines[len(kLines)-1].ClosePrice)
+	log.Debugf("symbol:%s, pd:%s, hd:%s, price:%v long_strategy:%s short_strategy:%s",
+		c.WatchList.Symbol, lib.PlaceDirectionStr(suggestion.PlaceOrderDirection),
+		lib.HoldDirectionStr(suggestion.HoldDirection), kLines[len(kLines)-1].ClosePrice,
+		suggestion.InLongStrategies, suggestion.InShortStrategies)
 
 	if suggestion.PlaceOrderDirection == lib.InUnknown {
-		SetSignal(c.Symbol, lib.InUnknown)
+		SetSignal(c.WatchList.Symbol, lib.InUnknown)
 		return
 	}
 
 	if suggestion.PlaceOrderDirection == lib.InLong {
-		val, err := GetSignal(c.Symbol)
+		val, err := GetSignal(c.WatchList.Symbol)
 		if err != nil {
 			log.Warnf("%s", err)
 			return
@@ -54,16 +54,15 @@ func (c CollectJob) Exec() {
 		if val != lib.InUnknown {
 			return
 		}
-		SetSignal(c.Symbol, lib.InLong)
+		SetSignal(c.WatchList.Symbol, lib.InLong)
 		err = GetRunner().Receive(ActualLongOrder{
-			Symbol:     c.Symbol,
-			Strategies: suggestion.InLongStrategies,
+			WatchList: c.WatchList,
 		})
 		if err != nil {
-			log.Debugf("simulate long order failed , symbol:%s err:%s", c.Symbol, err)
+			log.Debugf("watch long order failed , symbol:%s err:%s", c.WatchList.Symbol, err)
 		}
 	} else if suggestion.PlaceOrderDirection == lib.InShort {
-		val, err := GetSignal(c.Symbol)
+		val, err := GetSignal(c.WatchList.Symbol)
 		if err != nil {
 			log.Warnf("%s", err)
 			return
@@ -71,13 +70,12 @@ func (c CollectJob) Exec() {
 		if val != lib.InUnknown {
 			return
 		}
-		SetSignal(c.Symbol, lib.InShort)
+		SetSignal(c.WatchList.Symbol, lib.InShort)
 		err = GetRunner().Receive(ActualShortOrder{
-			Symbol:     c.Symbol,
-			Strategies: suggestion.InShortStrategies,
+			WatchList: c.WatchList,
 		})
 		if err != nil {
-			log.Debugf("simulate short order failed , symbol:%s err:%s", c.Symbol, err)
+			log.Debugf("watch short order failed , symbol:%s err:%s", c.WatchList.Symbol, err)
 		}
 	}
 }

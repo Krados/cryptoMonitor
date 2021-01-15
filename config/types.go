@@ -17,23 +17,23 @@ type APISetting struct {
 }
 
 type WatchList struct {
-	Symbol     string   `json:"symbol"`
-	Interval   string   `json:"interval"`
-	Limit      int      `json:"limit"`
-	Strategies []string `json:"strategies"`
+	Symbol         string         `json:"symbol"`
+	Interval       string         `json:"interval"`
+	Limit          int            `json:"limit"`
+	Strategies     []string       `json:"strategies"`
+	ProfitStrategy ProfitStrategy `json:"profit_strategy"`
 }
 
 type DataSource struct {
-	Name           string         `json:"name"`
-	Interval       time.Duration  `json:"interval"`
-	LogFileName    string         `json:"log_file_name"`
-	TradeRunnerNum int            `json:"trade_runner_num"`
-	APIKey         string         `json:"api_key"`
-	APISecret      string         `json:"api_secret"`
-	APISetting     APISetting     `json:"api_setting"`
-	WatchList      []WatchList    `json:"watch_list"`
-	Strategy       Strategy       `json:"strategy"`
-	ProfitStrategy ProfitStrategy `json:"profit_strategy"`
+	Name           string        `json:"name"`
+	Interval       time.Duration `json:"interval"`
+	LogFileName    string        `json:"log_file_name"`
+	TradeRunnerNum int           `json:"trade_runner_num"`
+	APIKey         string        `json:"api_key"`
+	APISecret      string        `json:"api_secret"`
+	APISetting     APISetting    `json:"api_setting"`
+	WatchList      []WatchList   `json:"watch_list"`
+	Strategy       Strategy      `json:"strategy"`
 }
 
 type SmaCross struct {

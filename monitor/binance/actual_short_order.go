@@ -12,20 +12,19 @@ import (
 
 type ActualShortOrder struct {
 	EnterPrice decimal.Decimal
-	Symbol     string
-	Strategies []string
+	WatchList  config.WatchList
 }
 
 func (s ActualShortOrder) Action() {
 	orderUUID := uuid.NewV4()
 	pMin := decimal.New(0, 0)
-	lossTick := config.Get().DataSource.ProfitStrategy.LossTick
-	shortTick := config.Get().DataSource.ProfitStrategy.ShortTick
+	lossTick := s.WatchList.ProfitStrategy.LossTick
+	shortTick := s.WatchList.ProfitStrategy.ShortTick
 	pNow := decimal.New(0, 0)
-	shortR := config.Get().DataSource.ProfitStrategy.ShortR
+	shortR := s.WatchList.ProfitStrategy.ShortR
 
 	// make sure there is no open order exists
-	_, exists, err := OpenOrder(s.Symbol)
+	_, exists, err := OpenOrder(s.WatchList.Symbol)
 	if err == nil {
 		if exists {
 			log.Warnf("signal:short open order exists")
@@ -51,26 +50,32 @@ func (s ActualShortOrder) Action() {
 	}
 
 	// send order
-	oriOrder, err := SendOrder(s.Symbol, "SELL", "MARKET", "1", "", "", "5000")
+	oriOrder, err := SendOrder(s.WatchList.Symbol, "SELL", "MARKET", "1", "", "", "5000")
 	if err != nil {
 		log.Warnf("signal:short send order failed, err:%s", err)
 		return
 	}
 
 	// get order
-	currentOrder, err := GetOrder(s.Symbol, oriOrder.OrderID)
+	currentOrder, err := GetOrder(s.WatchList.Symbol, oriOrder.OrderID)
 	if err != nil {
 		log.Warnf("signal:short get order failed, err:%s", err)
 		return
 	}
 
+	// order not exist then return
+	if currentOrder.AvgPrice.IsZero() {
+		log.Warn("currentOrder.AvgPrice.IsZero()")
+		return
+	}
+
 	s.EnterPrice = currentOrder.AvgPrice
 	pMax := s.EnterPrice.Add(lossTick)
-	tmpMsg := fmt.Sprintf("signal:short start uuid:%s symbol:%s pE:%s strategies:%s", orderUUID, s.Symbol, s.EnterPrice, s.Strategies)
+	tmpMsg := fmt.Sprintf("signal:short start uuid:%s symbol:%s pE:%s strategies:%s", orderUUID, s.WatchList.Symbol, s.EnterPrice, s.WatchList.Strategies)
 	service.GetTelegramBot().SendMessage(tmpMsg)
 	log.Info(tmpMsg)
 	for {
-		tmp, ok := GetPriceMap().Load(s.Symbol)
+		tmp, ok := GetPriceMap().Load(s.WatchList.Symbol)
 		if !ok {
 			continue
 		}
@@ -82,28 +87,28 @@ func (s ActualShortOrder) Action() {
 			tmpI := s.EnterPrice.Sub(pMin)
 			tmpI = tmpI.Mul(shortR)
 			if tmpI.GreaterThanOrEqual(s.EnterPrice.Sub(pNow)) {
-				outOrder, err := SendOrder(s.Symbol, "BUY", "MARKET", "1", "", "", "5000")
+				outOrder, err := SendOrder(s.WatchList.Symbol, "BUY", "MARKET", "1", "", "", "5000")
 				if err != nil {
 					log.Warnf("signal:short send order failed, err:%s", err)
 					return
 				}
 				log.Infof("%v", outOrder)
 				tmpMsg := fmt.Sprintf("signal:short win uuid:%s symbol:%s pE:%s pMax:%s pNow:%s",
-					orderUUID, s.Symbol, s.EnterPrice, pMax, pNow)
+					orderUUID, s.WatchList.Symbol, s.EnterPrice, pMax, pNow)
 				service.GetTelegramBot().SendMessage(tmpMsg)
 				log.Info(tmpMsg)
 				break
 			}
 		}
 		if pNow.GreaterThanOrEqual(pMax) {
-			outOrder, err := SendOrder(s.Symbol, "BUY", "MARKET", "1", "", "", "5000")
+			outOrder, err := SendOrder(s.WatchList.Symbol, "BUY", "MARKET", "1", "", "", "5000")
 			if err != nil {
 				log.Warnf("signal:short send order failed, err:%s", err)
 				return
 			}
 			log.Infof("%v", outOrder)
 			tmpMsg := fmt.Sprintf("signal:short lose uuid:%s symbol:%s pE:%s pMin:%s pNow:%s",
-				orderUUID, s.Symbol, s.EnterPrice, pMin, pNow)
+				orderUUID, s.WatchList.Symbol, s.EnterPrice, pMin, pNow)
 			service.GetTelegramBot().SendMessage(tmpMsg)
 			log.Infof(tmpMsg)
 			break

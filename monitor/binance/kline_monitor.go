@@ -34,14 +34,14 @@ func NewKlineMonitor() KlineMonitor {
 
 func (m KlineMonitor) Run() {
 	for i := 0; i < len(m.WatchList); i++ {
-		go m.GetKlineDataInterval(m.WatchList[i].Symbol, m.WatchList[i].Interval, m.WatchList[i].Limit, m.WatchList[i].Strategies)
+		go m.GetKlineDataInterval(m.WatchList[i])
 	}
 }
 
-func (m KlineMonitor) GetKlineDataInterval(symbol string, interval string, limit int, strategies []string) {
+func (m KlineMonitor) GetKlineDataInterval(watchList config.WatchList) {
 	ticker := time.NewTicker(m.Interval)
 	reqUrl := fmt.Sprintf("%s%s?symbol=%s&interval=%s&limit=%d",
-		m.BaseURL, m.KlineURI, symbol, interval, limit)
+		m.BaseURL, m.KlineURI, watchList.Symbol, watchList.Interval, watchList.Limit)
 	for range ticker.C {
 		kResp, err := GetKlineData(reqUrl)
 		if err != nil {
@@ -49,9 +49,8 @@ func (m KlineMonitor) GetKlineDataInterval(symbol string, interval string, limit
 			continue
 		}
 		m.Dispatcher.Dispatch(CollectJob{
-			KResp:      kResp,
-			Symbol:     symbol,
-			Strategies: strategies,
+			KResp:     kResp,
+			WatchList: watchList,
 		})
 	}
 }
