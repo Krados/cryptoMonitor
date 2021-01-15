@@ -55,7 +55,7 @@ func (c CollectJob) Exec() {
 			return
 		}
 		SetSignal(c.Symbol, lib.InLong)
-		err = GetRunner().Receive(SimulateLongOrder{
+		err = GetRunner().Receive(ActualLongOrder{
 			Symbol: c.Symbol,
 		})
 		if err != nil {
@@ -71,7 +71,7 @@ func (c CollectJob) Exec() {
 			return
 		}
 		SetSignal(c.Symbol, lib.InShort)
-		err = GetRunner().Receive(SimulateShortOrder{
+		err = GetRunner().Receive(ActualShortOrder{
 			Symbol: c.Symbol,
 		})
 		if err != nil {

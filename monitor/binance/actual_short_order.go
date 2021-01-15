@@ -4,30 +4,30 @@ import (
 	"cryptoMonitor/config"
 	"cryptoMonitor/service"
 	"fmt"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"time"
 )
 
-type SimulateLongOrder struct {
+type ActualShortOrder struct {
 	EnterPrice decimal.Decimal
 	Symbol     string
 }
 
-func (s SimulateLongOrder) Action() {
+func (s ActualShortOrder) Action() {
 	orderUUID := uuid.NewV4()
-	pMax := decimal.New(0, 0)
+	pMin := decimal.New(0, 0)
 	lossTick := config.Get().DataSource.ProfitStrategy.LossTick
-	longTick := config.Get().DataSource.ProfitStrategy.LongTick
+	shortTick := config.Get().DataSource.ProfitStrategy.ShortTick
 	pNow := decimal.New(0, 0)
-	longR := config.Get().DataSource.ProfitStrategy.LongR
+	shortR := config.Get().DataSource.ProfitStrategy.ShortR
 
 	// make sure there is no open order exists
 	_, exists, err := OpenOrder(s.Symbol)
 	if err == nil {
 		if exists {
-			log.Warnf("signal:long open order exists")
+			log.Warnf("signal:short open order exists")
 			return
 		}
 	}
@@ -35,7 +35,7 @@ func (s SimulateLongOrder) Action() {
 	// get balance
 	balanceResp, err := Balance()
 	if err != nil {
-		log.Warnf("signal:long get balance failed, err:%s", err)
+		log.Warnf("signal:short get balance failed, err:%s", err)
 		return
 	}
 	balance := decimal.New(0, 0)
@@ -45,27 +45,27 @@ func (s SimulateLongOrder) Action() {
 		}
 	}
 	if !balance.IsPositive() {
-		log.Warnf("signal:long !balance.IsPositive(), err:%s")
+		log.Warnf("signal:short !balance.IsPositive(), err:%s")
 		return
 	}
 
 	// send order
-	oriOrder, err := SendOrder(s.Symbol, "BUY", "MARKET", "1", "", "", "5000")
+	oriOrder, err := SendOrder(s.Symbol, "SELL", "MARKET", "1", "", "", "5000")
 	if err != nil {
-		log.Warnf("signal:long send order failed, err:%s", err)
+		log.Warnf("signal:short send order failed, err:%s", err)
 		return
 	}
 
 	// get order
 	currentOrder, err := GetOrder(s.Symbol, oriOrder.OrderID)
 	if err != nil {
-		log.Warnf("signal:long get order failed, err:%s", err)
+		log.Warnf("signal:short get order failed, err:%s", err)
 		return
 	}
 
 	s.EnterPrice = currentOrder.AvgPrice
-	pMin := s.EnterPrice.Sub(lossTick)
-	tmpMsg := fmt.Sprintf("signal:long start uuid:%s symbol:%s pE:%s", orderUUID, s.Symbol, s.EnterPrice)
+	pMax := s.EnterPrice.Add(lossTick)
+	tmpMsg := fmt.Sprintf("signal:short start uuid:%s symbol:%s pE:%s", orderUUID, s.Symbol, s.EnterPrice)
 	service.GetTelegramBot().SendMessage(tmpMsg)
 	log.Info(tmpMsg)
 	for {
@@ -74,37 +74,37 @@ func (s SimulateLongOrder) Action() {
 			continue
 		}
 		pNow = tmp.(decimal.Decimal)
-		if pNow.GreaterThan(pMax) {
-			pMax = pNow
+		if pNow.LessThan(pMin) {
+			pMin = pNow
 		}
-		if pNow.GreaterThanOrEqual(s.EnterPrice.Add(longTick)) {
-			tmpI := pMax.Sub(s.EnterPrice)
-			tmpI = tmpI.Mul(longR)
-			if tmpI.GreaterThanOrEqual(pNow.Sub(s.EnterPrice)) {
-				outOrder, err := SendOrder(s.Symbol, "SELL", "MARKET", "1", "", "", "5000")
+		if pNow.LessThanOrEqual(s.EnterPrice.Sub(shortTick)) {
+			tmpI := s.EnterPrice.Sub(pMin)
+			tmpI = tmpI.Mul(shortR)
+			if tmpI.GreaterThanOrEqual(s.EnterPrice.Sub(pNow)) {
+				outOrder, err := SendOrder(s.Symbol, "BUY", "MARKET", "1", "", "", "5000")
 				if err != nil {
-					log.Warnf("signal:long send order failed, err:%s", err)
+					log.Warnf("signal:short send order failed, err:%s", err)
 					return
 				}
 				log.Infof("%v", outOrder)
-				tmpMsg := fmt.Sprintf("signal:long win uuid:%s symbol:%s pE:%s pMax:%s pNow:%s",
+				tmpMsg := fmt.Sprintf("signal:short win uuid:%s symbol:%s pE:%s pMax:%s pNow:%s",
 					orderUUID, s.Symbol, s.EnterPrice, pMax, pNow)
 				service.GetTelegramBot().SendMessage(tmpMsg)
 				log.Info(tmpMsg)
 				break
 			}
 		}
-		if pNow.LessThanOrEqual(pMin) {
-			outOrder, err := SendOrder(s.Symbol, "SELL", "MARKET", "1", "", "", "5000")
+		if pNow.GreaterThanOrEqual(pMax) {
+			outOrder, err := SendOrder(s.Symbol, "BUY", "MARKET", "1", "", "", "5000")
 			if err != nil {
-				log.Warnf("signal:long send order failed, err:%s", err)
+				log.Warnf("signal:short send order failed, err:%s", err)
 				return
 			}
 			log.Infof("%v", outOrder)
-			tmpMsg := fmt.Sprintf("signal:long lose uuid:%s symbol:%s pE:%s pMin:%s pNow:%s",
+			tmpMsg := fmt.Sprintf("signal:short lose uuid:%s symbol:%s pE:%s pMin:%s pNow:%s",
 				orderUUID, s.Symbol, s.EnterPrice, pMin, pNow)
 			service.GetTelegramBot().SendMessage(tmpMsg)
-			log.Info(tmpMsg)
+			log.Infof(tmpMsg)
 			break
 		}
 		time.Sleep(time.Millisecond * 500)
