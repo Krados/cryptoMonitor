@@ -40,8 +40,9 @@ type KlineData struct {
 }
 
 type DirectionPrediction struct {
-	PlaceOrderDirection int `json:"place_order_direction"`
-	HoldDirection       int `json:"hold_direction"`
+	Name                string `json:"name"`
+	PlaceOrderDirection int    `json:"place_order_direction"`
+	HoldDirection       int    `json:"hold_direction"`
 }
 
 func PlaceDirectionStr(direction int) string {

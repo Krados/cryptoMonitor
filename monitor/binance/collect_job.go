@@ -56,7 +56,8 @@ func (c CollectJob) Exec() {
 		}
 		SetSignal(c.Symbol, lib.InLong)
 		err = GetRunner().Receive(ActualLongOrder{
-			Symbol: c.Symbol,
+			Symbol:     c.Symbol,
+			Strategies: suggestion.InLongStrategies,
 		})
 		if err != nil {
 			log.Debugf("simulate long order failed , symbol:%s err:%s", c.Symbol, err)
@@ -72,7 +73,8 @@ func (c CollectJob) Exec() {
 		}
 		SetSignal(c.Symbol, lib.InShort)
 		err = GetRunner().Receive(ActualShortOrder{
-			Symbol: c.Symbol,
+			Symbol:     c.Symbol,
+			Strategies: suggestion.InShortStrategies,
 		})
 		if err != nil {
 			log.Debugf("simulate short order failed , symbol:%s err:%s", c.Symbol, err)

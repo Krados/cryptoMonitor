@@ -13,6 +13,7 @@ import (
 type ActualLongOrder struct {
 	EnterPrice decimal.Decimal
 	Symbol     string
+	Strategies []string
 }
 
 func (s ActualLongOrder) Action() {
@@ -65,7 +66,7 @@ func (s ActualLongOrder) Action() {
 
 	s.EnterPrice = currentOrder.AvgPrice
 	pMin := s.EnterPrice.Sub(lossTick)
-	tmpMsg := fmt.Sprintf("signal:long start uuid:%s symbol:%s pE:%s", orderUUID, s.Symbol, s.EnterPrice)
+	tmpMsg := fmt.Sprintf("signal:long start uuid:%s symbol:%s pE:%s strategies:%s", orderUUID, s.Symbol, s.EnterPrice, s.Strategies)
 	service.GetTelegramBot().SendMessage(tmpMsg)
 	log.Info(tmpMsg)
 	for {

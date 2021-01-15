@@ -10,6 +10,7 @@ type DualThrust struct {
 }
 
 func (s DualThrust) Calculate(data []lib.KlineData) (prediction lib.DirectionPrediction, err error) {
+	prediction.Name = "DualThrust"
 	n := config.Get().DataSource.Strategy.DualThrust.N1K
 	kUp := config.Get().DataSource.Strategy.DualThrust.KUp
 	kDown := config.Get().DataSource.Strategy.DualThrust.KDown

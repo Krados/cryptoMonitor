@@ -9,6 +9,7 @@ type SmaCross struct {
 }
 
 func (s SmaCross) Calculate(data []lib.KlineData) (prediction lib.DirectionPrediction, err error) {
+	prediction.Name = "SmaCross"
 	n1 := config.Get().DataSource.Strategy.SmaCross.N1K
 	n2 := config.Get().DataSource.Strategy.SmaCross.N2K
 	n1Ma, err := NkMa(n1, 1, data)

@@ -15,8 +15,10 @@ type Executioner struct {
 }
 
 type FinalSuggestion struct {
-	PlaceOrderDirection int `json:"place_order_direction"`
-	HoldDirection       int `json:"hold_direction"`
+	PlaceOrderDirection int      `json:"place_order_direction"`
+	HoldDirection       int      `json:"hold_direction"`
+	InLongStrategies    []string `json:"in_long_strategies"`
+	InShortStrategies   []string `json:"in_short_strategies"`
 }
 
 func NewStrategyExecutioner() *Executioner {
@@ -71,8 +73,10 @@ func (e *Executioner) WrapUp() FinalSuggestion {
 	holdShortCount := 0
 	for _, val := range e.predictions {
 		if val.PlaceOrderDirection == lib.InLong {
+			suggestion.InLongStrategies = append(suggestion.InLongStrategies, val.Name)
 			inLongCount += 1
 		} else if val.PlaceOrderDirection == lib.InShort {
+			suggestion.InShortStrategies = append(suggestion.InShortStrategies, val.Name)
 			inShortCount += 1
 		}
 		if val.HoldDirection == lib.HoldLong {

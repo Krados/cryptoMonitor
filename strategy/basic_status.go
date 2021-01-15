@@ -9,6 +9,7 @@ type BasicStatus struct {
 }
 
 func (s BasicStatus) Calculate(data []lib.KlineData) (prediction lib.DirectionPrediction, err error) {
+	prediction.Name = "BasicStatus"
 	n := config.Get().DataSource.Strategy.BasicStatus.NK
 	n1Ma, err := NkMa(n, 1, data)
 	n2Ma, err := NkMa(n, 2, data)
