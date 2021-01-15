@@ -10,9 +10,12 @@ type BasicStatus struct {
 
 func (s BasicStatus) Calculate(data []lib.KlineData) (prediction lib.DirectionPrediction, err error) {
 	n := config.Get().DataSource.Strategy.BasicStatus.NK
-	n1Ma := NkMa(n, -2, data)
-	n2Ma := NkMa(n, -3, data)
-
+	n1Ma, err := NkMa(n, 1, data)
+	n2Ma, err := NkMa(n, 2, data)
+	if err != nil {
+		prediction.PlaceOrderDirection = lib.InUnknown
+		prediction.HoldDirection = lib.UnknownHold
+	}
 	diff := n1Ma.Sub(n2Ma)
 
 	if diff.IsPositive() {
