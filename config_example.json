@@ -20,7 +20,14 @@
           "sma_cross",
           "dual_thrust",
           "basic_status"
-        ]
+        ],
+        "profit_strategy": {
+          "long_r": "0.8",
+          "short_r": "0.8",
+          "loss_tick": "10",
+          "long_tick": "10",
+          "short_tick": "10"
+        }
       }
     ],
     "strategy": {
@@ -37,13 +44,6 @@
       "basic_status": {
         "nk": 120
       }
-    },
-    "profit_strategy": {
-      "long_r": "0.8",
-      "short_r": "0.8",
-      "loss_tick": "5",
-      "long_tick": "2.5",
-      "short_tick": "2.5"
     }
   },
   "telegram_bot": {
